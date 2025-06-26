@@ -1,0 +1,28 @@
+name: reubah
+services:
+  app:
+    image: ghcr.io/dendianugerah/reubah:latest
+    container_name: reubah
+    hostname: reubah
+    restart: always
+    pull_policy: always
+    environment:
+      - PORT=80
+    ports:
+      - '172.17.0.1:60148:80'
+    volumes:
+      - './rootfs/data/tmp:/tmp:rw'
+      - './rootfs/data/reubah:/app/tmp:rw'
+    healthcheck:
+      test: ['CMD-SHELL', 'nc -z 127.0.0.1 80 || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    networks:
+      - reubah
+
+networks:
+  reubah:
+    name: reubah
+    external: false
