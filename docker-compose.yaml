@@ -1,0 +1,39 @@
+# nginx proxy address - http://172.17.0.1:60177
+
+
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+name: reubah
+services:
+  app:
+    image: ghcr.io/dendianugerah/reubah:latest
+    container_name: reubah-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      PORT: 80
+    ports:
+      - '172.17.0.1:60148:80'
+    volumes:
+      - './rootfs/data/tmp:/tmp:rw'
+      - './rootfs/data/reubah:/app/tmp:rw'
+    healthcheck:
+      test: ['CMD-SHELL', 'nc -z 127.0.0.1 80 || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    networks:
+      - reubah
+
+networks:
+  reubah:
+    name: reubah
+    external: false
