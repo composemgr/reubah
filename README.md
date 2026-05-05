@@ -45,8 +45,8 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/data/tmp` - Data storage
-- `./rootfs/data/reubah` - Data storage
+- `./volumes/data/tmp` - Data storage
+- `./volumes/data/reubah` - Data storage
 
 ## 🔍 Logging
 
