@@ -22,8 +22,8 @@ services:
     ports:
       - '172.17.0.1:60148:80'
     volumes:
-      - './rootfs/data/tmp:/tmp:rw'
-      - './rootfs/data/reubah:/app/tmp:rw'
+      - './volumes/data/tmp:/tmp:rw'
+      - './volumes/data/reubah:/app/tmp:rw'
     healthcheck:
       test: ['CMD-SHELL', 'nc -z 127.0.0.1 80 || exit 1']
       interval: 10s
