@@ -1,28 +1,29 @@
-# nginx proxy address - http://172.17.0.1:8081
+# nginx proxy address - http://172.17.0.1:64329
 
-
+name: reubah
 x-logging: &default-logging
   options:
     max-size: '5m'
     max-file: '1'
   driver: json-file
 
-name: reubah
 services:
   app:
     image: ghcr.io/dendianugerah/reubah:latest
     container_name: reubah-app
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
     hostname: ${BASE_HOST_NAME:-$HOSTNAME}
     restart: always
     pull_policy: always
     logging: *default-logging
     environment:
       TZ: ${TZ:-America/New_York}
-      PORT: 8081
       CONTAINER_NAME: reubah-app
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+      # Reubah listens on this container port
+      PORT: '8081'
     ports:
-      - '172.17.0.1:8081:8081'
+      - '172.17.0.1:64329:8081'
     volumes:
       - './volumes/data/tmp:/tmp:rw'
       - './volumes/data/reubah:/app/tmp:rw'
@@ -34,30 +35,8 @@ services:
       start_period: 90s
     networks:
       - reubah
-      - proxy
-      - cloudflare
-    labels:
-      - 'traefik.enable=true'
-      - 'cloudflare.enable=true'
-      - 'traefik.docker.network=proxy'
-      - 'cloudflare.service=http://reubah-app:8081'
-      - 'cloudflare.hostname=reubah.${CLOUDFLARE_ZONE_NAME:-}'
-      - 'traefik.http.routers.reubah-app.entrypoints=http'
-      - 'traefik.http.routers.reubah-app-secure.tls=true'
-      - 'traefik.http.routers.reubah-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.middlewares.reubah-app-https-redirect.redirectscheme.scheme=https'
-      - 'traefik.http.routers.reubah-app.middlewares=reubah-app-https-redirect'
-      - 'traefik.http.routers.reubah-app-secure.entrypoints=https'
-      - 'traefik.http.routers.reubah-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.routers.reubah-app-secure.tls.certresolver=cloudflare'
-      - 'traefik.http.routers.reubah-app-secure.service=reubah-app'
-      - 'traefik.http.services.reubah-app.loadbalancer.server.port=8081'
 
 networks:
   reubah:
     name: reubah
     external: false
-  proxy:
-    external: true
-  cloudflare:
-    external: true
